@@ -26,6 +26,14 @@ from src.evaluation import evaluate_predictions
 from src.utils import export_results_to_csv
 from src.uncertainty import classify_with_gray_zone
 
+try:
+    from src.report_generator import build_run_report
+    PDF_REPORT_ENABLED = True
+except Exception as e:
+    PDF_REPORT_ENABLED = False
+    build_run_report = None
+
+
 # -----------------------------------------------------------------------------
 # Page config
 # -----------------------------------------------------------------------------
@@ -380,7 +388,7 @@ if rows:
                     threshold=confidence_slider.threshold,
                 )
                 st.download_button(
-                    "Download PDF Report",
+                    label="Download PDF Report",
                     data=pdf_bytes,
                     file_name="WBC_Run_Report.pdf",
                     mime="application/pdf",
