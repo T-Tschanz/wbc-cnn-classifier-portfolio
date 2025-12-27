@@ -58,32 +58,6 @@ username = "Portfolio Demo"
 #   - report_generator.generate_run_report(...)
 #   - report_builder.build_run_report(...)
 # -----------------------------------------------------------------------------
-HAS_PDF_REPORTS = False
-_build_report = None
-
-def _wire_pdf_builder():
-    """Try to import a compatible PDF builder and store it in _build_report."""
-    global HAS_PDF_REPORTS, _build_report
-    try:
-        import report_generator as _rg  # prefer report_generator
-        _build_report = getattr(_rg, "build_run_report", None) or getattr(_rg, "generate_run_report", None)
-        if _build_report:
-            HAS_PDF_REPORTS = True
-            return
-    except Exception:
-        pass
-    try:
-        import report_builder as _rb  # optional alternate
-        _build_report = getattr(_rb, "build_run_report", None) or getattr(_rb, "generate_run_report", None)
-        if _build_report:
-            HAS_PDF_REPORTS = True
-            return
-    except Exception:
-        pass
-
-_wire_pdf_builder()
-
-
 
 mm =ModelManager()
 # -----------------------------------------------------------------------------
@@ -377,41 +351,43 @@ if rows:
         overlay = overlay_saliency(np.array(sel["Original"]), sel["Saliency"])
         st.image(overlay, caption=f"Saliency Map ({sel['Decision']})", width=300)
 
+# --- Debug (temporary) ---
 with st.sidebar.expander("Debug: PDF Report", expanded=False):
     st.write("HAS_PDF_REPORTS:", HAS_PDF_REPORTS)
     st.write("_build_report is None:", _build_report is None)
-    if PDF_IMPORT_ERROR:
-        st.code(PDF_IMPORT_ERROR)
 
+# ---------- PDF run report ----------
+st.divider()
+st.subheader("Report")
 
-    # -------- PDF run report ----------
-    st.divider()
-    st.subheader("Report")
-    if HAS_PDF_REPORTS and _build_report:
-        if st.button("Build PDF Report"):
-            try:
+if HAS_PDF_REPORTS and _build_report:
+    if st.button("Build PDF Report"):
+        try:
+            with st.spinner("Building PDF report..."):
                 pdf_bytes = _build_report(
-                    df=df,                         # includes gray-zone metrics
-                    results=media,                 # contains Original & Saliency
+                    df=df,
+                    results=media,
                     class_labels=CLASS_LABELS,
                     labels_df=labels_df,
                     model_name=(model_choice if not uploaded_custom else "Custom (uploaded)"),
                     normalization=normalization,
                     threshold=confidence_slider.threshold,
                 )
-                st.download_button(
-                    label="Download PDF Report",
-                    data=pdf_bytes,
-                    file_name="WBC_Run_Report.pdf",
-                    mime="application/pdf",
-                )
-            except Exception as e:
-                st.error(f"Could not build PDF report: {e}")
-    else:
-        st.info(
-            "PDF report is disabled. To enable: keep `report_generator.py` (or `report_builder.py`) "
-            "exporting `build_run_report(...) -> bytes`, and ensure `reportlab` is listed in requirements.txt."
-        )
+
+            st.download_button(
+                label="Download PDF Report",
+                data=pdf_bytes,
+                file_name="WBC_Run_Report.pdf",
+                mime="application/pdf",
+            )
+        except Exception as e:
+            st.error(f"Could not build PDF report: {e}")
+else:
+    st.info(
+        "PDF report is disabled. To enable: ensure `src/report_generator.py` exports "
+        "`build_run_report(...) -> bytes`, and install `reportlab`."
+    )
+
 
 # Memory readout
 st.sidebar.write(f"Memory Usage: {monitor_memory_usage():.2f} MB")
