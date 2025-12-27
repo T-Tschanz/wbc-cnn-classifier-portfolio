@@ -26,12 +26,17 @@ from src.evaluation import evaluate_predictions
 from src.utils import export_results_to_csv
 from src.uncertainty import classify_with_gray_zone
 
+# --- Optional PDF report support ---
+HAS_PDF_REPORTS = False
+_build_report = None
+PDF_IMPORT_ERROR = None
+
 try:
-    from src.report_generator import build_run_report
-    PDF_REPORT_ENABLED = True
+    from src.report_generator import build_run_report as _build_report
+    HAS_PDF_REPORTS = True
 except Exception as e:
-    PDF_REPORT_ENABLED = False
-    build_run_report = None
+    PDF_IMPORT_ERROR = repr(e)
+
 
 
 # -----------------------------------------------------------------------------
