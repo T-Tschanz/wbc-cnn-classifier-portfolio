@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from sklearn.metrics import classification_report
-from visualization import plot_confusion_matrix
+from src.visualization import plot_confusion_matrix
 
 def evaluate_predictions(df, labels_df, class_labels, st):
     # Normalize filenames before merging

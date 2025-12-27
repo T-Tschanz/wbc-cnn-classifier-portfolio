@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from preprocessing import preprocess_image
+from src.preprocessing import preprocess_image
 
 def dummy_image(shape=(480,480,3)):
     return np.random.randint(0, 256, size=shape, dtype=np.uint8)
