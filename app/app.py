@@ -377,6 +377,13 @@ if rows:
         overlay = overlay_saliency(np.array(sel["Original"]), sel["Saliency"])
         st.image(overlay, caption=f"Saliency Map ({sel['Decision']})", width=300)
 
+with st.sidebar.expander("Debug: PDF Report", expanded=False):
+    st.write("HAS_PDF_REPORTS:", HAS_PDF_REPORTS)
+    st.write("_build_report is None:", _build_report is None)
+    if PDF_IMPORT_ERROR:
+        st.code(PDF_IMPORT_ERROR)
+
+
     # -------- PDF run report ----------
     st.divider()
     st.subheader("Report")
