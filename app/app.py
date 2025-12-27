@@ -9,10 +9,11 @@ import pandas as pd
 import numpy as np
 from PIL import Image
 import tensorflow as tf
-
+import sys
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR))
 
 from src.model_manager import ModelManager
 from src.confidence_slider import ConfidenceSlider
